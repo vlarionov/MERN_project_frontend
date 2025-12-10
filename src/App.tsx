@@ -3,6 +3,7 @@ import HomePage from "./pages/HomePage"
 import ProjectsPage from "./pages/ProjectsPage"
 import Navbar from "./components/Navbar"
 import ProjectDetailsPage from "./pages/ProjectDetailsPage"
+import UserPage from "./pages/UserPage"
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Navbar />
         <Routes>
           <Route path="/" element={<HomePage />}/>
+          <Route path="/userpage" element={<UserPage/>}/>
           <Route path="/projects" element={<ProjectsPage />}/>
           <Route path="/projects/:projectId" element={<ProjectDetailsPage />}/>
         </Routes>
