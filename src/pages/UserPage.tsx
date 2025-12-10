@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { apiClient } from "../clients/api";
+//import { User }  from "../models/User"
 
 function UserPage() {
 
@@ -13,27 +15,70 @@ function UserPage() {
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault()
+
+        // call validation function...
+        // see if the input fields are valid
+        // nab this from annother project...
+        if (!username || !email || !password) return;
+
         try {
             setError("");
             setLoading(true);
             console.log(`username: ${username}`)
             console.log(`email: ${email}`)
 
+            // register user
+            // make this a function in a separate module...
+            const resTest = await apiClient.get(
+                `/api/users/login`
+            );
+
+            console.log(resTest.data)
+
+            const res = await apiClient.post(
+                `/api/users/register` ,
+                {
+                    username: username,
+                    email: email,
+                    password: password
+                }
+            );
+
+            console.log(res.data)
+
         } catch (error: any) {
             console.error(error.message);
             setError(error.message)
         } finally {
             setLoading(false);
+            setUsername("");
+            setEmail("");
+            setPassword("");
         }
     };
 
     const handleLogin = async (event: React.FormEvent) => {
         event.preventDefault()
+
+        // validate input fields ...
+        if (!email || !password) return;
+
         try {
             setError("");
             setLoading(true);
             //console.log(`username: ${username}`)
             console.log(`email: ${email}`)
+
+            const res = await apiClient.post(
+                `/api/users/login` ,
+                {
+                    email: email,
+                    password: password
+                }
+            );
+
+            // need res.data.token
+            console.log(res.data.token)
 
         } catch (error: any) {
             console.error(error.message);
