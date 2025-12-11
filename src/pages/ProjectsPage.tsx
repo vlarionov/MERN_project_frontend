@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import type { Project } from "../types";
 import { AuthContext } from "../context/AuthProvider";
 
-
+import axios from 'axios'
 
 function ProjectsPage() {
     const [projects, setProjects] = useState<Project[]>([]);
@@ -13,6 +13,13 @@ function ProjectsPage() {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+
+    // variables for updating
+    const [updateName, setUpdateName] = useState('');
+    const [updateDescription, setUpdateDescription] = useState('');
+    const [updateProjectId, setUpdateProjectId] = useState('')
+
+    const [showUpdate, setShowUpdate] = useState(false);
 
     // AuthContext
     const { token } = useContext(AuthContext)!;
@@ -58,8 +65,18 @@ function ProjectsPage() {
         e.preventDefault();
 
         try{
+            //console.log(`user: ${user._id}`)
             setLoading(true);
-            const res =await apiClient.post('/api/projects', {headers: {
+            
+            // this works... for now
+            const apiClient2 = axios.create({
+                baseURL: import.meta.env.VITE_BACKEND_URL,
+                headers: {
+                    Authorization: token
+                }
+            })
+
+            const res =await apiClient2.post('/api/projects', {headers: {
                                 Authorization: token
                             }, name, description})
             setProjects(prev => (
@@ -95,6 +112,82 @@ function ProjectsPage() {
             setLoading(false)
             setName("");
             setDescription("")
+        }
+    }
+
+    const handleUpdate = async(project: Project) => {
+        //e.preventDefault();
+
+        try{
+            setLoading(true);
+            setShowUpdate(true);
+            console.log(`updating thing with id: ${project._id}`)
+            // const res = await apiClient.delete(`/api/projects/${projectId}`, {headers: {
+            //                     Authorization: token
+            //                 }})
+            // // update the projects array
+            // const updatedProjects = projects.filter((item) => item._id !== projectId)
+            // setProjects(updatedProjects);
+            setUpdateName(project.name)
+            setUpdateDescription(project.description);
+            setUpdateProjectId(project._id)
+            
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false)
+            setName("");
+            setDescription("")
+        }
+    }
+
+    const handleUpdateSubmit = async(e: React.FormEvent) => {
+        e.preventDefault();
+
+        try{
+            //console.log(`user: ${user._id}`)
+            setLoading(true);
+            
+            // this works... for now
+            const apiClient2 = axios.create({
+                baseURL: import.meta.env.VITE_BACKEND_URL,
+                headers: {
+                    Authorization: token
+                }
+            })
+
+            // setName(updateName);
+            // setDescription(updateDescription);
+
+            // console.log(`updateName: ${updateName} , updateDescription: ${updateDescription}`)
+            // console.log(`name: ${name} , description: ${description}`)
+
+            // index for updating array
+            const index = projects.findIndex(project => project._id === updateProjectId);
+
+
+            const res = await apiClient2.put(`/api/projects/${updateProjectId}`, {headers: {
+                                Authorization: token
+                            }, name: updateName, description: updateDescription})
+            
+            // update this properly
+            // setProjects(prev => (
+            //     [...prev, res.data]
+            // ))
+            setProjects(prevItems => {
+                const newItems = [...prevItems]; // Create a copy of the array
+                newItems[index] = res.data; // Update the element in the copy
+                return newItems; // Set state with the new copy
+            })
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false)
+            setName("");
+            setDescription("")
+            setShowUpdate(false)
         }
     }
 
@@ -147,6 +240,14 @@ function ProjectsPage() {
                         >
                             See Project
                         </Link>
+
+                        <button 
+                            className="mt-auto bg-sky-500 rounded hover:cursor-pointer"
+                            onClick={() => handleUpdate(project)}
+                        >
+                            Update Project
+                        </button>
+
                         <button 
                             className="mt-auto bg-sky-500 rounded hover:cursor-pointer"
                             onClick={()=>handleDelete(project._id)}
@@ -156,6 +257,35 @@ function ProjectsPage() {
                     </div>
                 ))}
             </div>
+            {showUpdate && 
+                <div>
+                    Update
+                    <form 
+                        onSubmit={handleUpdateSubmit}
+                        className="border p-2 h-50 mt-10 flex flex-col gap-2 rounded"
+                    >
+                        <label htmlFor="project-name">Project Name: </label>
+                        <input 
+                            type="text" 
+                            name="project-name" 
+                            className="border"
+                            value={updateName}
+                            onChange={(e) => setUpdateName(e.target.value)}
+                        />
+
+                        <label htmlFor="project-description">Project Description</label>
+                        <input 
+                            type="text" 
+                            name="project-description" 
+                            className="border"
+                            value={updateDescription}
+                            onChange={(e) => setUpdateDescription(e.target.value)}
+                        />
+
+                        <input type="submit" value="Update Project" className="mt-auto bg-sky-500 rounded"/>
+
+                    </form>
+                </div>}
         </div>
     );
 }
