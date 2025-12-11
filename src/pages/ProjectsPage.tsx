@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { apiClient } from "../clients/api";
 import { Link } from "react-router-dom";
 import type { Project } from "../types";
-import { AuthContext } from "../context/AuthProvider";
+//import { AuthContext } from "../context/AuthProvider";
 
 
 
@@ -15,15 +15,23 @@ function ProjectsPage() {
     const [description, setDescription] = useState('');
 
     // AuthContext
-    const { token } = useContext(AuthContext)!;
+    //const { token } = useContext(AuthContext)!;
 
     // fetch projects should be called each time the token changes...
+    // a lot of things need to be changed here....
+    
+
+    // for whatever reason using token and setToken doesnt cause a rerender,
+    // but refreshing the page does, and the apiClient changes as well
 
     useEffect(() => {
         const fetchProjects = async () => {
             try {
                 setLoading(true)
+                console.log(`useEffect is being called`)
+                console.log(apiClient.defaults.headers)
 
+                // need to change the apiClient!
                 const res = await apiClient.get('/api/projects');
                 console.log(res.data);
 
@@ -38,7 +46,7 @@ function ProjectsPage() {
 
         fetchProjects();
 
-    }, [token]);
+    }, []);
 
     if (loading) return <div className="text-3xl text-white">Loading...</div>
 
@@ -64,6 +72,11 @@ function ProjectsPage() {
     return (
         <div className="text-white">
             <h1 className="text-4xl font-bold text-white">Projects</h1>
+
+            {/* TOKEN */}
+             {/* <div className="text-3xl text-red-500 font-bold mt-10 text-center">
+                Token: {token}
+                </div> */}
 
             <form 
                 onSubmit={handleSubmit}

@@ -51,6 +51,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
             setToken(res.data.token);
             setUser(res.data.user);
 
+
             // set data in local storage
             localStorage.setItem('token', JSON.stringify(res.data.token));
             localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -60,9 +61,24 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         }
     }
 
-    const register = () => {}
+    const register = async (username: string, email: string, password: string) => {
+        try {
+            const res = await apiClient.post("/api/users/register", {username, email, password});
+            console.log(res.data);
+        } catch (error) {
+            console.error(error);
+        }
+    }
 
-    const logOut = () => {}
+    const logOut = () => {
+        // set data in state
+        setToken(null);
+        setUser(null);
+
+        // set data in local storage
+        localStorage.setItem('token', JSON.stringify(""));
+        localStorage.setItem('user', JSON.stringify(""));
+    }
 
     return (
         <AuthContext.Provider
