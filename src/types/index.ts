@@ -10,3 +10,11 @@ export interface User {
     email: string;
     githubId?: string;
 }
+
+export interface Task {
+    title: string;
+    description: string;
+    _id: string;
+    project: string;
+    status: ['todo', 'in-progress', 'done']
+}
