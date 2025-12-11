@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { apiClient } from "../clients/api";
-//import { User }  from "../models/User"
+
+import { AuthContext } from "../context/AuthProvider";
 
 function UserPage() {
 
@@ -12,6 +13,10 @@ function UserPage() {
 
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+
+    // AuthContext
+    const { logIn, register } = useContext(AuthContext)!;
+
 
     const handleRegister = async (event: React.FormEvent) => {
         event.preventDefault()
@@ -69,16 +74,18 @@ function UserPage() {
             //console.log(`username: ${username}`)
             console.log(`email: ${email}`)
 
-            const res = await apiClient.post(
-                `/api/users/login` ,
-                {
-                    email: email,
-                    password: password
-                }
-            );
+            // const res = await apiClient.post(
+            //     `/api/users/login` ,
+            //     {
+            //         email: email,
+            //         password: password
+            //     }
+            // );
 
             // need res.data.token
-            console.log(res.data.token)
+            // console.log(res.data.token)
+
+            logIn(email, password);
 
         } catch (error: any) {
             console.error(error.message);
@@ -183,7 +190,7 @@ function UserPage() {
 
                     <input 
                         type="submit"
-                        value="Register"
+                        value="Login"
                         className="border py-2 px-4 rounded"
                     />
                 </form>

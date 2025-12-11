@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { apiClient } from "../clients/api";
 import { Link } from "react-router-dom";
 import type { Project } from "../types";
+import { AuthContext } from "../context/AuthProvider";
+
 
 
 function ProjectsPage() {
@@ -11,6 +13,11 @@ function ProjectsPage() {
 
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+
+    // AuthContext
+    const { token } = useContext(AuthContext)!;
+
+    // fetch projects should be called each time the token changes...
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -31,7 +38,7 @@ function ProjectsPage() {
 
         fetchProjects();
 
-    }, []);
+    }, [token]);
 
     if (loading) return <div className="text-3xl text-white">Loading...</div>
 
