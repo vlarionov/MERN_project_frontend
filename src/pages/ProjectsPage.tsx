@@ -98,7 +98,7 @@ function ProjectsPage() {
         try{
             setLoading(true);
             console.log(`deleting thing with id: ${projectId}`)
-            const res = await apiClient.delete(`/api/projects/${projectId}`, {headers: {
+            await apiClient.delete(`/api/projects/${projectId}`, {headers: {
                                 Authorization: token
                             }})
             // update the projects array

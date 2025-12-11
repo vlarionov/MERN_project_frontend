@@ -116,7 +116,7 @@ function ProjectDetailsPage() {
       try{
           setLoading(true);
           console.log(`deleting thing with id: ${taskId}`)
-          const res = await apiClient.delete(`/api/tasks/${taskId}`, {headers: {
+          await apiClient.delete(`/api/tasks/${taskId}`, {headers: {
                               Authorization: token
                           }})
           // update the projects array
