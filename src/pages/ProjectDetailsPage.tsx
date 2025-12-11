@@ -15,11 +15,12 @@ function ProjectDetailsPage() {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('todo');
 
   // variables for updating
   const [updateTitle, setUpdateTitle] = useState('');
   const [updateDescription, setUpdateDescription] = useState('');
-  const [updateTaskStatus, setUpdateTaskStatus] = useState('')
+  const [updateTaskStatus, setUpdateTaskStatus] = useState('todo')
   const [updateTaskId, setUpdateTaskId] = useState('')
 
   const [showUpdate, setShowUpdate] = useState(false);
@@ -75,6 +76,39 @@ function ProjectDetailsPage() {
 
     fetchProjectTasks();
   }, [projectId]);
+
+  const handleSubmit = async(e: React.FormEvent) => {
+      e.preventDefault();
+
+      try{
+          //console.log(`user: ${user._id}`)
+          setLoading(true);
+          
+          // this works... for now
+          const apiClient2 = axios.create({
+              baseURL: import.meta.env.VITE_BACKEND_URL,
+              headers: {
+                  Authorization: token
+              }
+          })
+
+          console.log(`${title} ${description} ${status}`)
+          const res =await apiClient2.post(`/api/projects/${projectId}/tasks`, {headers: {
+                              Authorization: token
+                          }, title: title, description: description, status: status})
+          setTasks(prev => (
+              [...prev, res.data]
+          ))
+
+      } catch (error) {
+          console.error(error);
+      } finally {
+          setLoading(false)
+          setTitle("");
+          setDescription("")
+          setStatus("todo")
+      }
+  }
 
   const handleDelete = async(taskId: string) => {
       //e.preventDefault();
@@ -142,7 +176,7 @@ function ProjectDetailsPage() {
 
             const res = await apiClient2.put(`/api/tasks/${updateTaskId}`, {headers: {
                                 Authorization: token
-                            }, name: updateTitle, description: updateDescription, status: updateTaskStatus})
+                            }, title: updateTitle, description: updateDescription, status: updateTaskStatus})
             
             // update this properly
             // setProjects(prev => (
@@ -161,6 +195,7 @@ function ProjectDetailsPage() {
             setTitle("");
             setDescription("")
             setShowUpdate(false)
+
         }
     }
 
@@ -174,6 +209,42 @@ function ProjectDetailsPage() {
       <div className="mt-10">
         <div className="text-3xl">Project name: {project?.name}</div>
         <div className="text-xl">Project description: {project?.description}</div>
+
+        <form 
+              onSubmit={handleSubmit}
+              className="border p-2 h-50 mt-10 flex flex-col gap-2 rounded"
+          >
+              <label htmlFor="task-name">Task Name: </label>
+              <input 
+                  type="text" 
+                  name="task-name" 
+                  className="border"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+              />
+
+              <label htmlFor="task-description">Project Description</label>
+              <input 
+                  type="text" 
+                  name="task-description" 
+                  className="border"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+              />
+
+              <label htmlFor="task-status">Task Status: </label>
+                  <select 
+                    name="task-status" className="border"
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value="todo">todo</option>
+                    <option value="in-progress">in-progress</option>
+                    <option value="done">done</option>
+                  </select>
+
+              <input type="submit" value="Create task" className="mt-auto bg-sky-500 rounded"/>
+
+          </form>
 
         <div className="w-full flex gap-5 mt-10">
                 {tasks && tasks.map(task => (
