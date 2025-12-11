@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { apiClient } from "../clients/api";
 import { useParams } from "react-router-dom";
 import type { Project } from "../types";
+import { AuthContext } from "../context/AuthProvider";
 
 function ProjectDetailsPage() {
   const [project, setProject] = useState<Project | null>(null);
@@ -11,12 +12,18 @@ function ProjectDetailsPage() {
   const { projectId } = useParams();
   //console.log(projectId);
 
+  // AuthContext
+  const { token } = useContext(AuthContext)!;
+
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
         setLoading(true);
 
-        const res = await apiClient.get(`/api/projects/${projectId}`);
+        const res = await apiClient.get(`/api/projects/${projectId}`,
+          { headers: 
+            { Authorization: token}
+          });
         console.log(res.data);
 
         setProject(res.data);

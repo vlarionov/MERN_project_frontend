@@ -75,6 +75,29 @@ function ProjectsPage() {
         }
     }
 
+    const handleDelete = async(projectId: string) => {
+        //e.preventDefault();
+
+        try{
+            setLoading(true);
+            console.log(`deleting thing with id: ${projectId}`)
+            const res = await apiClient.delete(`/api/projects/${projectId}`, {headers: {
+                                Authorization: token
+                            }})
+            // update the projects array
+            const updatedProjects = projects.filter((item) => item._id !== projectId)
+            setProjects(updatedProjects);
+            
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false)
+            setName("");
+            setDescription("")
+        }
+    }
+
     return (
         <div className="text-white">
             <h1 className="text-4xl font-bold text-white">Projects</h1>
@@ -124,6 +147,12 @@ function ProjectsPage() {
                         >
                             See Project
                         </Link>
+                        <button 
+                            className="mt-auto bg-sky-500 rounded hover:cursor-pointer"
+                            onClick={()=>handleDelete(project._id)}
+                        >
+                            Delete Project
+                        </button>
                     </div>
                 ))}
             </div>
