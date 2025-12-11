@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import { apiClient } from "../clients/api";
 import { Link } from "react-router-dom";
 import type { Project } from "../types";
-//import { AuthContext } from "../context/AuthProvider";
+import { AuthContext } from "../context/AuthProvider";
 
 
 
@@ -15,7 +15,7 @@ function ProjectsPage() {
     const [description, setDescription] = useState('');
 
     // AuthContext
-    //const { token } = useContext(AuthContext)!;
+    const { token } = useContext(AuthContext)!;
 
     // fetch projects should be called each time the token changes...
     // a lot of things need to be changed here....
@@ -32,7 +32,11 @@ function ProjectsPage() {
                 console.log(apiClient.defaults.headers)
 
                 // need to change the apiClient!
-                const res = await apiClient.get('/api/projects');
+                const res = await apiClient.get('/api/projects', 
+                    {headers: {
+                                Authorization: token
+                            }
+                    });
                 console.log(res.data);
 
                 setProjects(res.data);
@@ -55,7 +59,9 @@ function ProjectsPage() {
 
         try{
             setLoading(true);
-            const res =await apiClient.post('/api/projects', {name, description})
+            const res =await apiClient.post('/api/projects', {headers: {
+                                Authorization: token
+                            }, name, description})
             setProjects(prev => (
                 [...prev, res.data]
             ))
